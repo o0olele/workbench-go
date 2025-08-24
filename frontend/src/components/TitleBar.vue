@@ -80,8 +80,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   height: 30px;
-  background-color: #1e1e1e;
-  border-bottom: 1px solid #333;
+  background-color: hsl(var(--background));
   padding: 0 8px;
   position: fixed;
   top: 0;
@@ -104,7 +103,7 @@ onMounted(() => {
 
 .app-name {
   font-size: 13px;
-  color: #cccccc;
+  color: hsl(var(--foreground));
   font-weight: 400;
 }
 
@@ -118,16 +117,17 @@ onMounted(() => {
   height: 30px;
   border: none;
   background: transparent;
-  color: #cccccc;
+  color: hsl(var(--muted-foreground));
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .window-control:hover {
-  background-color: #404040;
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }
 
 .window-control.close:hover {
@@ -136,10 +136,12 @@ onMounted(() => {
 }
 
 .window-control:active {
-  background-color: #505050;
+  background-color: hsl(var(--accent) / 0.8);
+  color: hsl(var(--accent-foreground));
 }
 
 .window-control.close:active {
   background-color: #f1707a;
+  color: white;
 }
 </style> 

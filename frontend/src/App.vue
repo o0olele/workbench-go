@@ -1,32 +1,33 @@
 <script lang="ts" setup>
-import HelloWorld from './components/HelloWorld.vue'
 import TitleBar from './components/TitleBar.vue'
+import WorkspaceArea from './components/WorkspaceArea.vue'
+import StatusBar from './components/StatusBar.vue'
 </script>
 
 <template>
-  <TitleBar />
-  <div class="app-content">
-    <img id="logo" alt="Wails logo" src="./assets/images/logo-universal.png"/>
-    <HelloWorld/>
+  <div class="app-container">
+    <TitleBar />
+    <div class="app-content">
+      <WorkspaceArea />
+    </div>
+    <StatusBar />
   </div>
 </template>
 
 <style>
-#logo {
-  display: block;
-  width: 50%;
-  height: 50%;
-  margin: auto;
-  padding: 10% 0 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-origin: content-box;
+.app-container {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-content {
-  padding-top: 30px; /* 为标题栏留出空间 */
-  height: calc(100vh - 30px);
-  overflow: auto;
+  flex: 1;
+  padding-top: 32px; /* 为固定定位的标题栏留出空间（30px + 2px边框）*/
+  padding-bottom: 0; /* 为状态栏留出空间 */
+  box-sizing: border-box;
+  overflow: hidden;
+  min-height: 0; /* 确保 flexbox 子项可以收缩 */
 }
 </style>
