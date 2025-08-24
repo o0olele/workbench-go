@@ -35,6 +35,7 @@ const getWailsFilters = (): frontend.FileFilter[] => {
 }
 
 const handleFileDrop = (x: number, y: number, paths: string[]) => {
+  console.log('Wails OnFileDrop triggered:', { x, y, paths })
   isDragOver.value = false
   
   if (paths.length > 0) {
@@ -94,26 +95,25 @@ const preventDefaults = (e: DragEvent) => {
   e.stopPropagation()
 }
 
-onMounted(() => {
+onMounted(async () => {
   // Setup Wails file drop listener
-  OnFileDrop(handleFileDrop, false)
+  await OnFileDrop(handleFileDrop, false)
   
-  // Prevent default browser drag behavior
+  // Prevent default browser drag behavior (but NOT drop - let Wails handle it)
   document.addEventListener('dragenter', preventDefaults)
   document.addEventListener('dragover', preventDefaults)
   document.addEventListener('dragleave', preventDefaults)
-  document.addEventListener('drop', preventDefaults)
+  // Remove the drop event prevention to allow Wails OnFileDrop to work
 })
 
 onUnmounted(() => {
   // Remove Wails file drop listener
   OnFileDropOff()
   
-  // Remove document event listeners
+  // Remove document event listeners (drop was not added)
   document.removeEventListener('dragenter', preventDefaults)
   document.removeEventListener('dragover', preventDefaults)
   document.removeEventListener('dragleave', preventDefaults)
-  document.removeEventListener('drop', preventDefaults)
 })
 </script>
 
@@ -128,6 +128,7 @@ onUnmounted(() => {
     @dragenter="handleDragEnter"
     @dragleave="handleDragLeave"
     @dragover="preventDefaults"
+    @drop="() => isDragOver = false"
     @click="openFileDialog"
   >
     <div class="flex flex-col items-center space-y-4">
