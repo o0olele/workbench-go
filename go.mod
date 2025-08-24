@@ -2,7 +2,10 @@ module workbench-go
 
 go 1.23
 
-require github.com/wailsapp/wails/v2 v2.10.1
+require (
+	github.com/o0olele/detour-go v0.2.3
+	github.com/wailsapp/wails/v2 v2.10.1
+)
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
