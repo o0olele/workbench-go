@@ -32,6 +32,9 @@ func main() {
 		Debug: options.Debug{
 			OpenInspectorOnStartup: true,
 		},
+		DragAndDrop: &options.DragAndDrop{
+			EnableFileDrop: true,
+		},
 	})
 
 	if err != nil {
