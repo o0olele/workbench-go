@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import * as THREE from 'three'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { PhysxXmlData } from '@/lib/physx/serialization'
 
 interface Props {
   files?: File[]
@@ -222,22 +223,15 @@ const loadOBJFile = async (file: File) => {
 const loadXMLFile = async (file: File) => {
   try {
     const text = await file.text()
-    const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(text, 'text/xml')
+    const physxXmlData = new PhysxXmlData()
+    physxXmlData.parseXml(text)
+    const mesh = physxXmlData.build(0)
+    if (mesh == null) {
+      console.error(`构建物理碰撞数据失败: ${file.name}`)
+      return
+    }
     
-    // 这里可以根据XML结构解析物理碰撞数据
-    // 暂时创建一个简单的立方体作为示例
-    const geometry = new THREE.BoxGeometry(2, 2, 2)
-    const material = new THREE.MeshLambertMaterial({ 
-      color: 0xff0000,
-      transparent: true,
-      opacity: 0.7
-    })
-    const cube = new THREE.Mesh(geometry, material)
-    cube.castShadow = true
-    cube.receiveShadow = true
-    
-    scene.add(cube)
+    scene.add(mesh)
     console.log(`已加载XML文件: ${file.name}`)
   } catch (error) {
     console.error(`加载XML文件失败: ${file.name}`, error)
