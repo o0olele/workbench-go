@@ -1,9 +1,12 @@
 module workbench-go
 
-go 1.23
+go 1.23.1
+
+toolchain go1.24.4
 
 require (
 	github.com/o0olele/detour-go v0.2.3
+	github.com/o0olele/octree-go v0.2.0
 	github.com/wailsapp/wails/v2 v2.10.1
 )
 
