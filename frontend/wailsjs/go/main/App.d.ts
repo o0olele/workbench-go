@@ -5,9 +5,17 @@ import {frontend} from '../models';
 
 export function AddAgent(arg1:string,arg2:number,arg3:number,arg4:number,arg5:number,arg6:number,arg7:number,arg8:number):Promise<void>;
 
+export function AddOctreeItem(arg1:string,arg2:main.OctreeParam,arg3:main.AgentParam,arg4:Array<main.Triangle>):Promise<void>;
+
 export function ClearAgent(arg1:string):Promise<void>;
 
+export function ExistOctree(arg1:string):Promise<boolean>;
+
+export function FindPathOctree(arg1:string,arg2:main.Vec3,arg3:main.Vec3):Promise<Array<main.Vec3>>;
+
 export function GetNavMeshInfo(arg1:string,arg2:boolean):Promise<main.NavInfo>;
+
+export function GetOctreeData(arg1:string):Promise<main.OctreeExport>;
 
 export function LoadNavMesh(arg1:string,arg2:string,arg3:string,arg4:Array<number>):Promise<void>;
 
@@ -18,6 +26,8 @@ export function OpenFileDialog(arg1:string,arg2:Array<frontend.FileFilter>):Prom
 export function ProcessSelectedFiles(arg1:Array<string>):Promise<void>;
 
 export function RemoveNavMesh(arg1:string):Promise<void>;
+
+export function ResetOctree(arg1:string):Promise<void>;
 
 export function SetAgentTarget(arg1:string,arg2:number,arg3:number,arg4:number):Promise<void>;
 

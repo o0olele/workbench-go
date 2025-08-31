@@ -6,12 +6,28 @@ export function AddAgent(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
   return window['go']['main']['App']['AddAgent'](arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }
 
+export function AddOctreeItem(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['App']['AddOctreeItem'](arg1, arg2, arg3, arg4);
+}
+
 export function ClearAgent(arg1) {
   return window['go']['main']['App']['ClearAgent'](arg1);
 }
 
+export function ExistOctree(arg1) {
+  return window['go']['main']['App']['ExistOctree'](arg1);
+}
+
+export function FindPathOctree(arg1, arg2, arg3) {
+  return window['go']['main']['App']['FindPathOctree'](arg1, arg2, arg3);
+}
+
 export function GetNavMeshInfo(arg1, arg2) {
   return window['go']['main']['App']['GetNavMeshInfo'](arg1, arg2);
+}
+
+export function GetOctreeData(arg1) {
+  return window['go']['main']['App']['GetOctreeData'](arg1);
 }
 
 export function LoadNavMesh(arg1, arg2, arg3, arg4) {
@@ -32,6 +48,10 @@ export function ProcessSelectedFiles(arg1) {
 
 export function RemoveNavMesh(arg1) {
   return window['go']['main']['App']['RemoveNavMesh'](arg1);
+}
+
+export function ResetOctree(arg1) {
+  return window['go']['main']['App']['ResetOctree'](arg1);
 }
 
 export function SetAgentTarget(arg1, arg2, arg3, arg4) {
