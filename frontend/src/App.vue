@@ -1,7 +1,22 @@
 <script lang="ts" setup>
+import { onMounted } from 'vue'
 import TitleBar from './components/TitleBar.vue'
 import WorkspaceArea from './components/WorkspaceArea.vue'
 import StatusBar from './components/StatusBar.vue'
+import { setLocale, getCurrentLocale } from './i18n'
+
+// 在应用启动时初始化语言设置
+onMounted(() => {
+  const savedLocale = localStorage.getItem('locale')
+  if (savedLocale && ['zh', 'en'].includes(savedLocale)) {
+    setLocale(savedLocale)
+  } else {
+    // 检测浏览器语言
+    const browserLang = navigator.language.toLowerCase()
+    const defaultLang = browserLang.startsWith('zh') ? 'zh' : 'en'
+    setLocale(defaultLang)
+  }
+})
 </script>
 
 <template>
