@@ -59,21 +59,6 @@ interface PathGraphData {
     edges: PathGraphEdge[]
 }
 
-interface PathResult {
-    found: boolean
-    path: PathPoint[]
-    length?: number
-    debug?: {
-        stepSize: number
-        agentRadius: number
-        agentHeight: number
-        startValidAgent?: boolean
-        endValidAgent?: boolean
-        startValid?: boolean
-        endValid?: boolean
-    }
-}
-
 // 组件引用
 const containerRef = ref<HTMLDivElement>()
 const canvasRef = ref<HTMLCanvasElement>()
@@ -85,6 +70,24 @@ let camera: THREE.PerspectiveCamera
 let renderer: THREE.WebGLRenderer
 let controls: OrbitControls
 let animationId: number
+let themeObserver: MutationObserver | null = null
+
+// 主题相关
+const updateSceneBackground = () => {
+    if (!scene) return
+    
+    // 获取当前主题的背景色
+    const htmlElement = document.documentElement
+    const isDark = htmlElement.classList.contains('dark')
+    
+    if (isDark) {
+        // 深色主题：使用深灰色
+        scene.background = new THREE.Color(0x1a1a1a)
+    } else {
+        // 浅色主题：使用浅灰色
+        scene.background = new THREE.Color(0xf5f5f5)
+    }
+}
 
 let pathGraphData: PathGraphData | null = null
 
@@ -100,8 +103,8 @@ const initScene = () => {
 
     // 创建场景
     scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x1a1a2e)
-    scene.fog = new THREE.Fog(0x1a1a2e, 50, 200)
+    scene.background = new THREE.Color(0x1a1a1a)
+    // scene.fog = new THREE.Fog(0x1a1a1a, 50, 200)
 
     // 创建相机
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
@@ -212,6 +215,21 @@ const animate = () => {
 onMounted(() => {
     nextTick(() => {
         initScene()
+
+        // 监听主题变化
+        themeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    updateSceneBackground()
+                }
+            })
+        })
+        
+        // 开始观察 html 元素的 class 属性变化
+        themeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        })
     })
 })
 
@@ -225,6 +243,9 @@ onUnmounted(() => {
     }
     if (renderer) {
         renderer.dispose()
+    }
+    if (themeObserver) {
+        themeObserver.disconnect()
     }
     window.removeEventListener('resize', handleWindowResize)
 })

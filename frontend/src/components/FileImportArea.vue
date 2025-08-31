@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Upload, FileIcon } from 'lucide-vue-next'
+import { Upload } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Props {
   title: string
@@ -101,10 +104,10 @@ onUnmounted(() => {
       <div>
         <h3 class="text-lg font-semibold mb-2">{{ title }}</h3>
         <p class="text-sm text-muted-foreground mb-2">
-          点击选择文件或拖拽文件到这里
+          {{ t('workspace.click_or_drag') }}
         </p>
         <p class="text-xs text-muted-foreground">
-          支持的格式: {{ accept === '*' ? '所有文件' : accept }}
+          {{ t('workspace.supported_formats') }}: {{ accept === '*' ? t('workspace.all_files') : accept }}
         </p>
       </div>
     </div>
@@ -114,7 +117,7 @@ onUnmounted(() => {
       class="absolute inset-0 bg-primary/20 rounded-lg flex items-center justify-center"
     >
       <div class="text-primary font-medium">
-        释放文件进行导入
+        {{ t('workspace.drop_files') }}
       </div>
     </div>
   </div>

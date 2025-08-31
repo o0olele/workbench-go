@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Plus, X } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import FileImportArea from './FileImportArea.vue'
 import GoFileImportArea from './GoFileImportArea.vue'
 import ThreeJSScene from './ThreeJSScene.vue'
 import NavMeshScene from './NavMeshScene.vue'
 import OctreeScene from './OctreeScene.vue'
-import { LogDebug } from '../../wailsjs/runtime/runtime'
+
+const { t } = useI18n()
 
 type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree'
 
@@ -21,18 +23,31 @@ interface TabItem {
 }
 
 const tabs = ref<TabItem[]>([
-  { id: 'welcome', title: '欢迎页', type: 'welcome', content: '欢迎使用工作台！' }
+  { id: 'welcome', title: 'workspace.welcome_page', type: 'welcome', content: 'workspace.welcome_message' }
 ])
 
 const activeTab = ref('welcome')
 const nextTabId = ref(2)
 
+// 计算属性：处理标签页标题的国际化
+const getTabTitle = (tab: TabItem) => {
+  if (tab.title.includes('|')) {
+    const [key, suffix] = tab.title.split('|')
+    return `${t(key)} - ${suffix}`
+  }
+  if (tab.title.startsWith('workspace.new_tab_')) {
+    const number = tab.title.replace('workspace.new_tab_', '')
+    return `${t('workspace.new_tab')} ${number}`
+  }
+  return t(tab.title)
+}
+
 const addNewTab = () => {
   const newTab: TabItem = {
     id: `tab-${nextTabId.value}`,
-    title: `新标签页 ${nextTabId.value}`,
+    title: `workspace.new_tab_${nextTabId.value}`,
     type: 'welcome',
-    content: `这是新标签页 ${nextTabId.value} 的内容`
+    content: `workspace.new_tab_${nextTabId.value}`
   }
   tabs.value.push(newTab)
   activeTab.value = newTab.id
@@ -64,7 +79,7 @@ const handleNavMeshFiles = (files: string[]) => {
   // 将当前tab转换为3D场景类型
   const currentTab = tabs.value[currentTabIndex]
   currentTab.type = 'navmesh'
-  currentTab.title = `NavMesh调试 - ${files.map(f => f).join(', ')}`
+  currentTab.title = `workspace.navmesh_tab_title|${files.map(f => f).join(', ')}`
   currentTab.filesString = [...files]
 }
 
@@ -82,7 +97,7 @@ const handlePhysicsFiles = (files: File[]) => {
   // 将当前tab转换为3D场景类型
   const currentTab = tabs.value[currentTabIndex]
   currentTab.type = 'threejs'
-  currentTab.title = `物理碰撞可视化 - ${files.map(f => f.name).join(', ')}`
+  currentTab.title = `workspace.physics_tab_title|${files.map(f => f.name).join(', ')}`
   currentTab.files = [...files]
 }
 
@@ -94,7 +109,7 @@ const handleOctreeScene = () => {
   // 将当前tab转换为八叉树场景类型
   const currentTab = tabs.value[currentTabIndex]
   currentTab.type = 'octree'
-  currentTab.title = '八叉树场景'
+  currentTab.title = 'workspace.octree_tab_title'
 }
 
 const navMeshFilters = [
@@ -112,9 +127,9 @@ const navMeshFilters = [
         <div class="flex items-center">
           <TabsList class="flex-1 justify-start h-10 bg-transparent p-0">
             <TabsTrigger v-for="tab in tabs" :key="tab.id" :value="tab.id"
-              :title="tab.title"
+              :title="getTabTitle(tab)"
               class="relative group h-10 px-3 data-[state=active]:bg-background data-[state=active]:shadow-sm flex items-center justify-between tab-fixed-width">
-              <span class="truncate flex-1 text-left">{{ tab.title }}</span>
+              <span class="truncate flex-1 text-left">{{ getTabTitle(tab) }}</span>
               <button v-if="tabs.length > 1" @click.stop="removeTab(tab.id)"
                 class="ml-2 opacity-0 group-hover:opacity-100 hover:bg-destructive/20 hover:text-destructive rounded-sm p-0.5 transition-all flex-shrink-0">
                 <X class="w-3 h-3" />
@@ -125,7 +140,7 @@ const navMeshFilters = [
           <!-- 添加标签页按钮 -->
           <button @click="addNewTab"
             class="flex items-center justify-center w-10 h-10 hover:bg-accent rounded-md transition-colors"
-            title="添加新标签页">
+            :title="t('workspace.add_new_tab')">
             <Plus class="w-4 h-4" />
           </button>
         </div>
@@ -141,20 +156,20 @@ const navMeshFilters = [
             <div class="max-w-4xl w-full space-y-8 mb-16">
               <!-- 标签页标题 -->
               <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold mb-2">{{ tab.title }}</h2>
-                <p class="text-muted-foreground">{{ tab.content }}</p>
+                <h2 class="text-2xl font-bold mb-2">{{ getTabTitle(tab) }}</h2>
+                <p class="text-muted-foreground">{{ t(tab.content || '') }}</p>
               </div>
 
               <!-- 文件导入区域 -->
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                <GoFileImportArea title="NavMesh调试" :filters="[
+                <GoFileImportArea :title="t('workspace.navmesh_debug')" :filters="[
                   { pattern: '*.bin', displayName: 'Binary NavMesh (*.bin)' },
                   { pattern: '*.navmesh', displayName: 'NavMesh Files (*.navmesh)' }
                 ]" @files-selected="handleNavMeshFiles" @file-processed="handleNavMeshFilesProcessed" />
 
                 <!-- 物理碰撞可视化 -->
-                <FileImportArea title="物理碰撞可视化" accept=".xml,.obj" :multiple="false"
+                <FileImportArea :title="t('workspace.physics_visualization')" accept=".xml,.obj" :multiple="false"
                   @files-selected="handlePhysicsFiles" />
 
                 <!-- 八叉树场景 -->
@@ -170,12 +185,12 @@ const navMeshFilters = [
                     </div>
                     
                     <div>
-                      <h3 class="text-lg font-semibold mb-2">八叉树场景</h3>
+                      <h3 class="text-lg font-semibold mb-2">{{ t('workspace.octree_scene') }}</h3>
                       <p class="text-sm text-muted-foreground mb-2">
-                        点击进入八叉树可视化场景
+                        {{ t('workspace.click_to_enter_octree') }}
                       </p>
                       <p class="text-xs text-muted-foreground">
-                        空间分割数据结构可视化
+                        {{ t('workspace.spatial_data_structure') }}
                       </p>
                     </div>
                   </div>

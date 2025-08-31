@@ -8,14 +8,14 @@
 
     <!-- 右侧：窗口控制按钮 -->
     <div class="title-bar-right">
-      <button @click="minimizeWindow" class="window-control minimize" title="最小化" style="--wails-draggable: no-drag;">
+      <button @click="minimizeWindow" class="window-control minimize" :title="t('common.minimize')" style="--wails-draggable: no-drag;">
         <Minus :size="14" />
       </button>
-      <button @click="toggleMaximize" class="window-control maximize" :title="isMaximized ? '还原' : '最大化'" style="--wails-draggable: no-drag;">
+      <button @click="toggleMaximize" class="window-control maximize" :title="isMaximized ? t('common.restore') : t('common.maximize')" style="--wails-draggable: no-drag;">
         <Maximize2 v-if="!isMaximized" :size="14" />
         <Minimize2 v-else :size="14" />
       </button>
-      <button @click="closeWindow" class="window-control close" title="关闭" style="--wails-draggable: no-drag;">
+      <button @click="closeWindow" class="window-control close" :title="t('common.close')" style="--wails-draggable: no-drag;">
         <X :size="14" />
       </button>
     </div>
@@ -25,7 +25,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Minus, Maximize2, Minimize2, X } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import { WindowMaximise, WindowMinimise, WindowUnmaximise, Quit, WindowIsMaximised } from '../../wailsjs/runtime/runtime'
+
+const { t } = useI18n()
 
 const isMaximized = ref(false)
 
@@ -144,4 +147,4 @@ onMounted(() => {
   background-color: #f1707a;
   color: white;
 }
-</style> 
+</style>

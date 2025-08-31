@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Sun, Moon, Monitor } from 'lucide-vue-next'
+import { Sun, Moon, Monitor, Languages } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
+import { setLocale, getCurrentLocale } from '@/i18n'
 
 type Theme = 'light' | 'dark' | 'system'
+type Locale = 'zh' | 'en'
 
+const { t } = useI18n()
 const currentTheme = ref<Theme>('dark')
+const currentLocale = ref<Locale>('zh')
 const systemTime = ref('')
 
 // 获取当前时间
@@ -69,14 +74,26 @@ const getThemeIcon = () => {
 const getThemeLabel = () => {
   switch (currentTheme.value) {
     case 'light':
-      return '浅色主题'
+      return t('theme.light')
     case 'dark':
-      return '深色主题'
+      return t('theme.dark')
     case 'system':
-      return '跟随系统'
+      return t('theme.system')
     default:
-      return '深色主题'
+      return t('theme.dark')
   }
+}
+
+// 语言切换
+const toggleLanguage = () => {
+  const newLocale = currentLocale.value === 'zh' ? 'en' : 'zh'
+  currentLocale.value = newLocale
+  setLocale(newLocale)
+}
+
+// 获取语言标签
+const getLanguageLabel = () => {
+  return currentLocale.value === 'zh' ? t('common.chinese') : t('common.english')
 }
 
 // 初始化
@@ -87,6 +104,9 @@ onMounted(() => {
     currentTheme.value = savedTheme
     applyTheme(savedTheme)
   }
+  
+  // 初始化语言设置
+  currentLocale.value = getCurrentLocale() as Locale
   
   // 开始时间更新
   updateTime()
@@ -108,14 +128,24 @@ onMounted(() => {
     <div class="flex items-center space-x-4">
       <span class="flex items-center">
         <span class="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
-        就绪
+        {{ t('common.ready') }}
       </span>
-      <span class="text-primary">Workbench v1.0.0</span>
+      <span class="text-primary">{{ t('app.name') }} {{ t('app.version') }}</span>
     </div>
     
     <!-- 右侧控制区 -->
     <div class="flex items-center space-x-3">
       <span class="font-mono">{{ systemTime }}</span>
+      
+      <!-- 语言切换按钮 -->
+      <button
+        @click="toggleLanguage"
+        :title="t('common.language')"
+        class="flex items-center space-x-1 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors"
+      >
+        <Languages class="w-3 h-3" />
+        <span class="hidden sm:inline">{{ getLanguageLabel() }}</span>
+      </button>
       
       <!-- 主题切换按钮 -->
       <button
