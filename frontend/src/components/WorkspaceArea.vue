@@ -6,9 +6,10 @@ import FileImportArea from './FileImportArea.vue'
 import GoFileImportArea from './GoFileImportArea.vue'
 import ThreeJSScene from './ThreeJSScene.vue'
 import NavMeshScene from './NavMeshScene.vue'
+import OctreeScene from './OctreeScene.vue'
 import { LogDebug } from '../../wailsjs/runtime/runtime'
 
-type TabType = 'welcome' | 'threejs' | 'navmesh'
+type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree'
 
 interface TabItem {
   id: string
@@ -85,6 +86,17 @@ const handlePhysicsFiles = (files: File[]) => {
   currentTab.files = [...files]
 }
 
+const handleOctreeScene = () => {
+  // 找到当前激活的tab
+  const currentTabIndex = tabs.value.findIndex(tab => tab.id === activeTab.value)
+  if (currentTabIndex === -1) return
+
+  // 将当前tab转换为八叉树场景类型
+  const currentTab = tabs.value[currentTabIndex]
+  currentTab.type = 'octree'
+  currentTab.title = '八叉树场景'
+}
+
 const navMeshFilters = [
   { pattern: '*.bin', displayName: 'Binary NavMesh (*.bin)' },
   { pattern: '*.navmesh', displayName: 'NavMesh Files (*.navmesh)' }
@@ -134,11 +146,8 @@ const navMeshFilters = [
               </div>
 
               <!-- 文件导入区域 -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- NavMesh调试 -->
-                <!-- <FileImportArea title="NavMesh调试" accept=".bin,.navmesh" :multiple="false"
-                  @files-selected="handleNavMeshFiles" /> -->
-
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
                 <GoFileImportArea title="NavMesh调试" :filters="[
                   { pattern: '*.bin', displayName: 'Binary NavMesh (*.bin)' },
                   { pattern: '*.navmesh', displayName: 'NavMesh Files (*.navmesh)' }
@@ -147,6 +156,30 @@ const navMeshFilters = [
                 <!-- 物理碰撞可视化 -->
                 <FileImportArea title="物理碰撞可视化" accept=".xml,.obj" :multiple="false"
                   @files-selected="handlePhysicsFiles" />
+
+                <!-- 八叉树场景 -->
+                <div
+                  class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-accent/50 border-border"
+                  @click="handleOctreeScene"
+                >
+                  <div class="flex flex-col items-center space-y-4">
+                    <div class="p-4 rounded-full bg-accent">
+                      <svg class="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                      </svg>
+                    </div>
+                    
+                    <div>
+                      <h3 class="text-lg font-semibold mb-2">八叉树场景</h3>
+                      <p class="text-sm text-muted-foreground mb-2">
+                        点击进入八叉树可视化场景
+                      </p>
+                      <p class="text-xs text-muted-foreground">
+                        空间分割数据结构可视化
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -159,6 +192,11 @@ const navMeshFilters = [
           <!-- NavMesh 3D场景类型 -->
           <div v-else-if="tab.type === 'navmesh'" class="h-full">
             <NavMeshScene :files="tab.filesString || []" :nav-mesh-id="tab.id" />
+          </div>
+
+          <!-- 八叉树场景类型 -->
+          <div v-else-if="tab.type === 'octree'" class="h-full">
+            <OctreeScene :id="tab.id" />
           </div>
         </TabsContent>
       </Tabs>
