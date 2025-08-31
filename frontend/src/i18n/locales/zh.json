@@ -1,0 +1,42 @@
+{
+  "common": {
+    "ready": "就绪",
+    "processing": "处理中...",
+    "welcome": "欢迎",
+    "close": "关闭",
+    "minimize": "最小化",
+    "maximize": "最大化",
+    "restore": "还原",
+    "language": "语言",
+    "chinese": "中文",
+    "english": "English"
+  },
+  "theme": {
+    "light": "浅色主题",
+    "dark": "深色主题",
+    "system": "跟随系统"
+  },
+  "workspace": {
+    "welcome_page": "欢迎页",
+    "new_tab": "新标签页",
+    "add_new_tab": "添加新标签页",
+    "welcome_message": "欢迎使用工作台！",
+    "navmesh_debug": "NavMesh调试",
+    "physics_visualization": "物理碰撞可视化",
+    "octree_scene": "八叉树场景",
+    "click_or_drag": "点击选择文件或拖拽文件到这里",
+    "click_to_enter_octree": "点击进入八叉树可视化场景",
+    "spatial_data_structure": "空间分割数据结构可视化",
+    "supported_formats": "支持的格式",
+    "all_files": "所有文件",
+    "multi_file_support": "支持多文件选择",
+    "drop_files": "释放文件进行导入",
+    "navmesh_tab_title": "NavMesh调试",
+    "physics_tab_title": "物理碰撞可视化",
+    "octree_tab_title": "八叉树可视化"
+  },
+  "app": {
+    "name": "Workbench",
+    "version": "v1.0.0"
+  }
+}
