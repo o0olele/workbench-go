@@ -6,5 +6,8 @@ A desktop application build with Wails.
 # Features
 
 - Navmesh debugger.
+![](./img/navmesh.png)
+- Octree Pathfinder.
+![](./img/octree.png)
 - Obj file viewer.
 
