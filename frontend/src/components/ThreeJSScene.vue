@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { PhysxXmlData } from '@/lib/physx/serialization'
+import { CameraControls } from '@/lib/camera-controls'
 
 interface Props {
   files?: File[]
@@ -19,6 +20,7 @@ let scene: THREE.Scene
 let camera: THREE.PerspectiveCamera
 let renderer: THREE.WebGLRenderer
 let controls: OrbitControls
+let cameraControls: CameraControls
 let animationId: number
 let resizeObserver: ResizeObserver | null = null
 let themeObserver: MutationObserver | null = null
@@ -102,7 +104,9 @@ const initScene = () => {
   controls.screenSpacePanning = false
   controls.minDistance = 1
   controls.maxDistance = 100
-  controls.maxPolarAngle = Math.PI / 2 // 限制垂直旋转角度
+  
+  // 创建相机控制器
+  cameraControls = new CameraControls(camera, controls, canvasRef.value)
 
   // 设置尺寸监听
   setupResizeObserver()
@@ -162,6 +166,11 @@ const resizeRenderer = (width: number, height: number) => {
 // 动画循环
 const animate = () => {
   animationId = requestAnimationFrame(animate)
+  
+  // 更新相机控制
+  if (cameraControls) {
+    cameraControls.update()
+  }
   
   // 更新轨道控制器
   if (controls) {
@@ -335,6 +344,12 @@ onUnmounted(() => {
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
+  
+  // 清理相机控制器
+  if (cameraControls) {
+    cameraControls.dispose()
+  }
+  
   if (controls) {
     controls.dispose()
   }
@@ -347,6 +362,7 @@ onUnmounted(() => {
   if (themeObserver) {
     themeObserver.disconnect()
   }
+  
   window.removeEventListener('resize', handleWindowResize)
 })
 </script>
