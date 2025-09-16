@@ -15,50 +15,6 @@ const props = withDefaults(defineProps<Props>(), {
     id: () => 'default'
 })
 
-// 类型定义
-interface Bounds {
-    min: { x: number; y: number; z: number }
-    max: { x: number; y: number; z: number }
-}
-
-interface GeometryData {
-    type: string
-    data: any
-}
-
-interface PathPoint {
-    x: number
-    y: number
-    z: number
-}
-
-interface OctreeNode {
-    is_leaf: boolean
-    is_occupied: boolean
-    bounds: Bounds
-    children?: OctreeNode[]
-}
-
-interface OctreeData {
-    root: OctreeNode
-}
-
-interface PathGraphNode {
-    id: number
-    center: { x: number; y: number; z: number }
-    bounds: Bounds
-}
-
-interface PathGraphEdge {
-    node_a_id: number
-    node_b_id: number
-}
-
-interface PathGraphData {
-    nodes: PathGraphNode[]
-    edges: PathGraphEdge[]
-}
-
 // 组件引用
 const containerRef = ref<HTMLDivElement>()
 const canvasRef = ref<HTMLCanvasElement>()
@@ -88,8 +44,6 @@ const updateSceneBackground = () => {
         scene.background = new THREE.Color(0xf5f5f5)
     }
 }
-
-let pathGraphData: PathGraphData | null = null
 
 let pane: Pane
 let octreeHelper: OctreeHelper

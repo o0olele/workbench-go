@@ -5,6 +5,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { PhysxXmlData } from '@/lib/physx/serialization'
 import { CameraControls } from '@/lib/camera-controls'
+import { Pane } from 'tweakpane'
 
 interface Props {
   files?: File[]
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const containerRef = ref<HTMLDivElement>()
 const canvasRef = ref<HTMLCanvasElement>()
+const paneRef = ref<HTMLElement>()
 let scene: THREE.Scene
 let camera: THREE.PerspectiveCamera
 let renderer: THREE.WebGLRenderer
@@ -26,27 +28,52 @@ let resizeObserver: ResizeObserver | null = null
 let themeObserver: MutationObserver | null = null
 let isSceneInitialized = false
 let pendingFiles: File[] = []
+let pane: Pane
+
+const isZReversed = ref(false)
+const isXReversed = ref(false)
+
+const toggleCoordinateSystem = (axis: 'x' | 'z') => {
+  if (!camera || !controls) return
+  if (axis === 'x') {
+    isXReversed.value = !isXReversed.value
+  } else if (axis === 'z') {
+    isZReversed.value = !isZReversed.value
+  }
+
+  // By default, three.js uses a right-handed coordinate system.
+  // To switch to a left-handed system view, we can effectively mirror the world
+  // along one axis. The most common convention change is the Z-axis direction.
+  // We do this by negating the camera's Z position and re-orienting it.
+  if (axis === 'x') {
+    camera.position.x *= -1
+  } else if (axis === 'z') {
+    camera.position.z *= -1
+  }
+  camera.lookAt(controls.target)
+  controls.update()
+}
 
 // 主题相关
 const updateSceneBackground = () => {
-    if (!scene) return
-    
-    // 获取当前主题的背景色
-    const htmlElement = document.documentElement
-    const isDark = htmlElement.classList.contains('dark')
-    
-    if (isDark) {
-        // 深色主题：使用深灰色
-        scene.background = new THREE.Color(0x1a1a1a)
-    } else {
-        // 浅色主题：使用浅灰色
-        scene.background = new THREE.Color(0xf5f5f5)
-    }
+  if (!scene) return
+
+  // 获取当前主题的背景色
+  const htmlElement = document.documentElement
+  const isDark = htmlElement.classList.contains('dark')
+
+  if (isDark) {
+    // 深色主题：使用深灰色
+    scene.background = new THREE.Color(0x1a1a1a)
+  } else {
+    // 浅色主题：使用浅灰色
+    scene.background = new THREE.Color(0xf5f5f5)
+  }
 }
 
 // 初始化Three.js场景
 const initScene = () => {
-  if (!canvasRef.value || !containerRef.value) return
+  if (!canvasRef.value || !containerRef.value || !paneRef.value) return
 
   // 获取容器尺寸
   const containerRect = containerRef.value.getBoundingClientRect()
@@ -63,9 +90,9 @@ const initScene = () => {
   camera.lookAt(0, 0, 0)
 
   // 创建渲染器
-  renderer = new THREE.WebGLRenderer({ 
+  renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,
-    antialias: true 
+    antialias: true
   })
   renderer.setSize(width, height)
   renderer.shadowMap.enabled = true
@@ -94,7 +121,7 @@ const initScene = () => {
   const axesHelper = new THREE.AxesHelper(5)
   axesHelper.userData.isUserObject = false
   scene.add(axesHelper)
-  
+
   console.log('场景初始化完成，基础对象数量:', scene.children.length)
 
   // 设置轨道控制器
@@ -104,23 +131,47 @@ const initScene = () => {
   controls.screenSpacePanning = false
   controls.minDistance = 1
   controls.maxDistance = 100
-  
+
   // 创建相机控制器
   cameraControls = new CameraControls(camera, controls, canvasRef.value)
 
   // 设置尺寸监听
   setupResizeObserver()
-  
+
   // 标记场景已初始化
   isSceneInitialized = true
-  
+
   // 如果有等待加载的文件，现在加载它们
   if (pendingFiles.length > 0) {
     console.log(`加载等待中的${pendingFiles.length}个文件`)
     loadFiles([...pendingFiles])
     pendingFiles = []
   }
+
+  pane = new Pane({
+    container: paneRef.value
+  })
+  const folder = pane.addFolder({ title: 'Scene' })
+  const params = {
+    background: { r: 18, g: 18, b: 18 },
+    isXReversed: isXReversed.value,
+    isZReversed: isZReversed.value
+  }
+  folder.addBinding(params, 'background', { label: 'Background Color' }).on('change', e => {
+    scene.background = new THREE.Color(e.value.r / 255, e.value.g / 255, e.value.b / 255)
+  })
   
+  folder.addBinding(params, 'isXReversed', { label: 'X轴反转' }).on('change', e => {
+    if (isXReversed.value !== e.value) {
+      toggleCoordinateSystem('x')
+    }
+  })
+  folder.addBinding(params, 'isZReversed', { label: 'Z轴反转' }).on('change', e => {
+    if (isZReversed.value !== e.value) {
+      toggleCoordinateSystem('z')
+    }
+  })
+
   // 开始渲染循环
   animate()
 }
@@ -128,7 +179,7 @@ const initScene = () => {
 // 设置尺寸监听器
 const setupResizeObserver = () => {
   if (!containerRef.value) return
-  
+
   resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
       const { width, height } = entry.contentRect
@@ -137,9 +188,9 @@ const setupResizeObserver = () => {
       }
     }
   })
-  
+
   resizeObserver.observe(containerRef.value)
-  
+
   // 也监听窗口大小变化
   window.addEventListener('resize', handleWindowResize)
 }
@@ -147,7 +198,7 @@ const setupResizeObserver = () => {
 // 处理窗口大小变化
 const handleWindowResize = () => {
   if (!containerRef.value) return
-  
+
   const containerRect = containerRef.value.getBoundingClientRect()
   if (containerRect.width > 0 && containerRect.height > 0) {
     resizeRenderer(containerRect.width, containerRect.height)
@@ -157,7 +208,7 @@ const handleWindowResize = () => {
 // 调整渲染器尺寸
 const resizeRenderer = (width: number, height: number) => {
   if (!camera || !renderer) return
-  
+
   camera.aspect = width / height
   camera.updateProjectionMatrix()
   renderer.setSize(width, height)
@@ -166,39 +217,39 @@ const resizeRenderer = (width: number, height: number) => {
 // 动画循环
 const animate = () => {
   animationId = requestAnimationFrame(animate)
-  
+
   // 更新相机控制
   if (cameraControls) {
     cameraControls.update()
   }
-  
+
   // 更新轨道控制器
   if (controls) {
     controls.update()
   }
-  
+
   renderer.render(scene, camera)
 }
 
 // 加载OBJ文件
 const loadOBJFile = async (file: File) => {
   const loader = new OBJLoader()
-  
+
   try {
     console.log(`开始加载OBJ文件: ${file.name}`)
     const text = await file.text()
     console.log(`文件内容长度: ${text.length}`)
-    
+
     const object = loader.parse(text)
     console.log(`解析的对象:`, object)
     console.log(`对象子元素数量:`, object.children.length)
-    
+
     // 设置材质
     let meshCount = 0
     object.traverse((child: THREE.Object3D) => {
       if (child instanceof THREE.Mesh) {
         meshCount++
-        child.material = new THREE.MeshLambertMaterial({ 
+        child.material = new THREE.MeshLambertMaterial({
           color: 0x00ff00,
           wireframe: false
         })
@@ -208,18 +259,18 @@ const loadOBJFile = async (file: File) => {
       }
     })
     console.log(`找到${meshCount}个mesh对象`)
-    
+
     // 计算边界盒以居中对象
     const box = new THREE.Box3().setFromObject(object)
     const center = box.getCenter(new THREE.Vector3())
     const size = box.getSize(new THREE.Vector3())
     console.log(`对象边界盒:`, { center, size })
-    
+
     // 如果对象有内容才进行位置和缩放调整
     if (size.x > 0 || size.y > 0 || size.z > 0) {
       object.position.sub(center)
     }
-    
+
     scene.add(object)
     console.log(`已成功加载OBJ文件到场景: ${file.name}`)
     console.log(`当前场景子对象数量:`, scene.children.length)
@@ -239,7 +290,7 @@ const loadXMLFile = async (file: File) => {
       console.error(`构建物理碰撞数据失败: ${file.name}`)
       return
     }
-    
+
     scene.add(mesh)
     console.log(`已加载XML文件: ${file.name}`)
   } catch (error) {
@@ -254,37 +305,37 @@ const loadFiles = async (files: File[]) => {
     pendingFiles = [...files]
     return
   }
-  
+
   console.log(`开始加载${files.length}个文件`)
   console.log(`加载前场景子对象数量:`, scene.children.length)
-  
+
   // 清除之前的用户添加的对象（保留灯光、网格和坐标轴）
   const objectsToRemove: THREE.Object3D[] = []
   scene.traverse((child) => {
     // 移除之前加载的模型，但保留场景基础对象
-    if (child !== scene && 
-        !(child instanceof THREE.Light) && 
-        !(child instanceof THREE.GridHelper) && 
-        !(child instanceof THREE.AxesHelper) &&
-        child.parent === scene) {
+    if (child !== scene &&
+      !(child instanceof THREE.Light) &&
+      !(child instanceof THREE.GridHelper) &&
+      !(child instanceof THREE.AxesHelper) &&
+      child.parent === scene) {
       // 只移除直接添加到场景的对象
       if (child.userData.isUserObject !== false) {
         objectsToRemove.push(child)
       }
     }
   })
-  
+
   console.log(`将移除${objectsToRemove.length}个之前的对象`)
   objectsToRemove.forEach(obj => {
     scene.remove(obj)
     console.log('移除对象:', obj)
   })
-  
+
   // 加载新文件
   for (const file of files) {
     const extension = file.name.toLowerCase().split('.').pop()
     console.log(`处理文件: ${file.name}, 扩展名: ${extension}`)
-    
+
     switch (extension) {
       case 'obj':
         await loadOBJFile(file)
@@ -296,7 +347,7 @@ const loadFiles = async (files: File[]) => {
         console.warn(`不支持的文件类型: ${extension}`)
     }
   }
-  
+
   console.log(`加载完成后场景子对象数量:`, scene.children.length)
 }
 
@@ -315,7 +366,7 @@ watch(() => props.files, (newFiles, oldFiles) => {
 onMounted(() => {
   nextTick(() => {
     initScene()
-    
+
     // 监听主题变化
     themeObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -324,13 +375,13 @@ onMounted(() => {
         }
       })
     })
-    
+
     // 开始观察 html 元素的 class 属性变化
     themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
     })
-    
+
     // 初始化完成后，如果props中已经有文件，立即加载
     if (props.files && props.files.length > 0) {
       console.log(`组件挂载后发现${props.files.length}个文件，立即加载`)
@@ -344,12 +395,12 @@ onUnmounted(() => {
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
-  
+
   // 清理相机控制器
   if (cameraControls) {
     cameraControls.dispose()
   }
-  
+
   if (controls) {
     controls.dispose()
   }
@@ -362,17 +413,15 @@ onUnmounted(() => {
   if (themeObserver) {
     themeObserver.disconnect()
   }
-  
+
   window.removeEventListener('resize', handleWindowResize)
 })
 </script>
 
 <template>
   <div ref="containerRef" class="threejs-container">
-    <canvas 
-      ref="canvasRef"
-      class="threejs-canvas"
-    />
+    <div ref="paneRef" class="debug-container"></div>
+    <canvas ref="canvasRef" class="threejs-canvas" />
   </div>
 </template>
 
@@ -388,5 +437,17 @@ onUnmounted(() => {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.debug-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+/* 确保 tweakpane 内部元素可以接收鼠标事件 */
+.debug-container :deep(.tp-dfwv) {
+  pointer-events: auto;
 }
 </style>
