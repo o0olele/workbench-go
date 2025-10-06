@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { Pane } from 'tweakpane';
 import { nextTick } from 'vue'
 import * as models from '../../wailsjs/go/models';
-import { AddOctreeItem, ExistOctree, GetOctreeData, ResetOctree,FindPathOctree } from '../../wailsjs/go/main/App';
+import { AddOctreeItem, ExistOctree, GetOctreeData, ResetOctree, FindPathOctree } from '../../wailsjs/go/main/App';
 
 export class OctreeHelper {
     public min: { x: number, y: number, z: number } = { x: -1, y: -1, z: -1 }
@@ -17,11 +17,11 @@ export class OctreeHelper {
     public agentRadius: number = 0.4
     public agentStart: { x: number, y: number, z: number } = { x: 0, y: 0, z: 0 }
     public agentEnd: { x: number, y: number, z: number } = { x: 0, y: 0, z: 0 }
-    
+
     // 起点和终点标记
     private startMarker: THREE.Mesh | null = null
     private endMarker: THREE.Mesh | null = null
-    
+
     // Octree 显示状态
     private showingOctree: boolean = false
 
@@ -55,7 +55,7 @@ export class OctreeHelper {
         this.scene.add(this.pathGroup)
         this.objLoader = new OBJLoader()
         this.gltfLoader = new GLTFLoader()
-        
+
         // 初始化起点和终点标记
         this.createMarkers()
     }
@@ -152,17 +152,17 @@ export class OctreeHelper {
         const folder = this.pane.addFolder({ title: 'Agent' })
         folder.addBinding(this, "agentHeight", { label: 'AgentHeight' })
         folder.addBinding(this, "agentRadius", { label: 'AgentRadius' })
-        
+
         // 添加起点位置控制，并在变化时更新标记
         folder.addBinding(this, "agentStart", { label: 'Start Position' }).on('change', () => {
             this.updateStartMarker()
         })
-        
+
         // 添加终点位置控制，并在变化时更新标记
         folder.addBinding(this, "agentEnd", { label: 'End Position' }).on('change', () => {
             this.updateEndMarker()
         })
-        
+
         // 添加路径控制子文件夹
         const pathFolder = folder.addFolder({ title: 'Path Controls' })
         pathFolder.addButton({ title: 'Find Path', label: 'Find Path' }).on('click', () => {
@@ -657,13 +657,13 @@ export class OctreeHelper {
     async reset() {
         await ResetOctree(this.id)
         this.showingOctree = false
-        
+
         // 重置按钮文本
         if (this.showOctreeButton) {
             this.showOctreeButton.title = 'Show'
             this.showOctreeButton.label = 'Show Octree'
         }
-        
+
         this.clear()
     }
     // 路径相关变量
@@ -680,7 +680,7 @@ export class OctreeHelper {
         this.clearPath()
 
         // 调用后端API获取路径
-        const path = await FindPathOctree(this.id, 
+        const path = await FindPathOctree(this.id,
             { X: this.agentStart.x, Y: this.agentStart.y, Z: this.agentStart.z },
             { X: this.agentEnd.x, Y: this.agentEnd.y, Z: this.agentEnd.z },
         )
@@ -755,7 +755,7 @@ export class OctreeHelper {
         // 设置代理初始位置
         if (this.currentPath && this.currentPath.length > 0) {
             const startPoint = this.currentPath[0]
-            this.agentMesh.position.set(startPoint.x, startPoint.y+this.agentRadius+this.agentHeight/2, startPoint.z)
+            this.agentMesh.position.set(startPoint.x, startPoint.y + this.agentRadius + this.agentHeight / 2, startPoint.z)
         }
 
         // 添加到场景
@@ -777,7 +777,7 @@ export class OctreeHelper {
             const position = this.getPositionAlongPath(this.animationProgress)
             if (this.agentMesh) {
                 this.agentMesh.position.copy(position)
-                this.agentMesh.position.y += this.agentRadius+this.agentHeight/2
+                this.agentMesh.position.y += this.agentRadius + this.agentHeight / 2
             }
 
             if (this.animationProgress < 1) {
@@ -820,13 +820,13 @@ export class OctreeHelper {
             if (targetDistance <= segmentEnd) {
                 const segmentProgress = (targetDistance - currentDistance) / segmentLengths[i]
                 const start = new THREE.Vector3(
-                    this.currentPath[i].x, 
-                    this.currentPath[i].y, 
+                    this.currentPath[i].x,
+                    this.currentPath[i].y,
                     this.currentPath[i].z
                 )
                 const end = new THREE.Vector3(
-                    this.currentPath[i + 1].x, 
-                    this.currentPath[i + 1].y, 
+                    this.currentPath[i + 1].x,
+                    this.currentPath[i + 1].y,
                     this.currentPath[i + 1].z
                 )
 
@@ -870,9 +870,9 @@ export class OctreeHelper {
         const startGeometry = new THREE.CapsuleGeometry(this.agentRadius, this.agentHeight, 8, 8)
         const startMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
         this.startMarker = new THREE.Mesh(startGeometry, startMaterial)
-        this.startMarker.position.set(this.agentStart.x, this.agentStart.y+this.agentRadius+this.agentHeight/2, this.agentStart.z)
+        this.startMarker.position.set(this.agentStart.x, this.agentStart.y + this.agentRadius + this.agentHeight / 2, this.agentStart.z)
         this.scene.add(this.startMarker)
-        
+
         // 创建终点标记（红色）
         const endGeometry = new THREE.SphereGeometry(0.2, 16, 16)
         const endMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
@@ -880,34 +880,34 @@ export class OctreeHelper {
         this.endMarker.position.set(this.agentEnd.x, this.agentEnd.y, this.agentEnd.z)
         this.scene.add(this.endMarker)
     }
-    
+
     // 更新起点标记位置
     private updateStartMarker() {
         if (this.startMarker) {
-            this.startMarker.position.set(this.agentStart.x, this.agentStart.y+this.agentRadius+this.agentHeight/2, this.agentStart.z)
+            this.startMarker.position.set(this.agentStart.x, this.agentStart.y + this.agentRadius + this.agentHeight / 2, this.agentStart.z)
         }
     }
-    
+
     // 更新终点标记位置
     private updateEndMarker() {
         if (this.endMarker) {
             this.endMarker.position.set(this.agentEnd.x, this.agentEnd.y, this.agentEnd.z)
         }
     }
-    
+
     // 清除标记
     private clearMarkers() {
         if (this.startMarker && this.scene.getObjectById(this.startMarker.id)) {
             this.scene.remove(this.startMarker)
             this.startMarker = null
         }
-        
+
         if (this.endMarker && this.scene.getObjectById(this.endMarker.id)) {
             this.scene.remove(this.endMarker)
             this.endMarker = null
         }
     }
-    
+
     clear() {
         this.clearAllObstacles()
         this.loadedModels = []

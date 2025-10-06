@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Plus, X } from 'lucide-vue-next'
+import { Plus, X, Joystick } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import FileImportArea from './FileImportArea.vue'
@@ -8,10 +8,11 @@ import GoFileImportArea from './GoFileImportArea.vue'
 import ThreeJSScene from './ThreeJSScene.vue'
 import NavMeshScene from './NavMeshScene.vue'
 import OctreeScene from './OctreeScene.vue'
+import PhysxDebugScene from './PhysxDebugScene.vue'
 
 const { t } = useI18n()
 
-type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree'
+type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree' | 'physx'
 
 interface TabItem {
   id: string
@@ -47,7 +48,7 @@ const addNewTab = () => {
     id: `tab-${nextTabId.value}`,
     title: `workspace.new_tab_${nextTabId.value}`,
     type: 'welcome',
-    content: `workspace.new_tab_${nextTabId.value}`
+    content: `workspace.welcome_content`
   }
   tabs.value.push(newTab)
   activeTab.value = newTab.id
@@ -84,7 +85,7 @@ const handleNavMeshFiles = (files: string[]) => {
 }
 
 const handleNavMeshFilesProcessed = (success: boolean, error?: string) => {
-  
+
   console.debug('File processing result:', { success, error })
 }
 
@@ -112,6 +113,17 @@ const handleOctreeScene = () => {
   currentTab.title = 'workspace.octree_tab_title'
 }
 
+const handlePhysxDebugScene = () => {
+  // 找到当前激活的tab
+  const currentTabIndex = tabs.value.findIndex(tab => tab.id === activeTab.value)
+  if (currentTabIndex === -1) return
+
+  // 将当前tab转换为PhysX调试场景类型
+  const currentTab = tabs.value[currentTabIndex]
+  currentTab.type = 'physx'
+  currentTab.title = 'workspace.physx_debug'
+}
+
 const navMeshFilters = [
   { pattern: '*.bin', displayName: 'Binary NavMesh (*.bin)' },
   { pattern: '*.navmesh', displayName: 'NavMesh Files (*.navmesh)' }
@@ -120,14 +132,13 @@ const navMeshFilters = [
 </script>
 
 <template>
-  <div class="h-full flex flex-col bg-background" >
+  <div class="h-full flex flex-col bg-background">
     <!-- 顶部标签栏 -->
-    <div class="border-b bg-card" >
-      <Tabs v-model="activeTab" class="w-full" >
+    <div class="border-b bg-card">
+      <Tabs v-model="activeTab" class="w-full">
         <div class="flex items-center">
           <TabsList class="flex-1 justify-start h-10 bg-transparent p-0">
-            <TabsTrigger v-for="tab in tabs" :key="tab.id" :value="tab.id"
-              :title="getTabTitle(tab)"
+            <TabsTrigger v-for="tab in tabs" :key="tab.id" :value="tab.id" :title="getTabTitle(tab)"
               class="relative group h-10 px-3 data-[state=active]:bg-background data-[state=active]:shadow-sm flex items-center justify-between tab-fixed-width">
               <span class="truncate flex-1 text-left">{{ getTabTitle(tab) }}</span>
               <button v-if="tabs.length > 1" @click.stop="removeTab(tab.id)"
@@ -157,12 +168,12 @@ const navMeshFilters = [
               <!-- 标签页标题 -->
               <div class="text-center mb-8">
                 <h2 class="text-2xl font-bold mb-2">{{ getTabTitle(tab) }}</h2>
-                <p class="text-muted-foreground">{{ t(tab.content || '') }}</p>
+                <p class="text-muted-foreground">{{ t(tab.content || 'workspace.welcome_content') }}</p>
               </div>
 
               <!-- 文件导入区域 -->
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
+
                 <GoFileImportArea :title="t('workspace.navmesh_debug')" :filters="[
                   { pattern: '*.bin', displayName: 'Binary NavMesh (*.bin)' },
                   { pattern: '*.navmesh', displayName: 'NavMesh Files (*.navmesh)' }
@@ -175,15 +186,17 @@ const navMeshFilters = [
                 <!-- 八叉树场景 -->
                 <div
                   class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-accent/50 border-border"
-                  @click="handleOctreeScene"
-                >
+                  @click="handleOctreeScene">
                   <div class="flex flex-col items-center space-y-4">
                     <div class="p-4 rounded-full bg-accent">
-                      <svg class="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                      <svg class="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                        </path>
                       </svg>
                     </div>
-                    
+
                     <div>
                       <h3 class="text-lg font-semibold mb-2">{{ t('workspace.octree_scene') }}</h3>
                       <p class="text-sm text-muted-foreground mb-2">
@@ -195,6 +208,29 @@ const navMeshFilters = [
                     </div>
                   </div>
                 </div>
+
+                <!-- physx场景 -->
+                <div
+                  class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-accent/50 border-border"
+                  @click="handlePhysxDebugScene">
+                  <div class="flex flex-col items-center space-y-4">
+
+                    <div class="p-4 rounded-full bg-accent">
+                      <Joystick class="w-8 h-8 text-muted-foreground" />
+                    </div>
+
+                    <div>
+                      <h3 class="text-lg font-semibold mb-2">{{ t('workspace.physx_debug') }}</h3>
+                      <p class="text-sm text-muted-foreground mb-2">
+                        {{ t('workspace.click_to_enter_physx') }}
+                      </p>
+                      <p class="text-xs text-muted-foreground">
+                        {{ t('workspace.physx_debug') }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -212,6 +248,11 @@ const navMeshFilters = [
           <!-- 八叉树场景类型 -->
           <div v-else-if="tab.type === 'octree'" class="h-full">
             <OctreeScene :id="tab.id" />
+          </div>
+
+          <!-- PhysX调试场景类型 -->
+          <div v-else-if="tab.type === 'physx'" class="h-full">
+            <PhysxDebugScene :id="tab.id" />
           </div>
         </TabsContent>
       </Tabs>

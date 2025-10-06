@@ -36,7 +36,10 @@ const messages = {
             "drop_files": "释放文件进行导入",
             "navmesh_tab_title": "NavMesh调试",
             "physics_tab_title": "物理碰撞可视化",
-            "octree_tab_title": "八叉树可视化"
+            "octree_tab_title": "八叉树可视化",
+            "physx_debug": "PhysX调试",
+            "click_to_enter_physx": "点击进入PhysX调试场景",
+            "welcome_content": "欢迎使用Workbench！"
         },
         "app": {
             "name": "Workbench",
@@ -78,7 +81,10 @@ const messages = {
             "supported_formats": "Supported formats",
             "all_files": "All files",
             "multi_file_support": "Multi-file selection supported",
-            "drop_files": "Drop files to import"
+            "drop_files": "Drop files to import",
+            "physx_debug": "PhysX Debug",
+            "click_to_enter_physx": "Click to enter PhysX debug scene",
+            "welcome_content": "Welcome to Workbench!"
         },
         "app": {
             "name": "Workbench",

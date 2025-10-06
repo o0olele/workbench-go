@@ -25,7 +25,7 @@ export class PhysxXmlData {
     private shapes: Map<number, PhysxShape> = new Map();
     private triangles: Map<number, PhysxTriangleMesh> = new Map();
     private convexes: Map<number, PhysxConvexMesh> = new Map();
-    private firstId: number = 0;
+    public firstId: number = 0;
 
     /**
      * 解析PhysX XML文件
@@ -34,18 +34,18 @@ export class PhysxXmlData {
     parseXml(text: string): void {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(text, "text/xml");
-        
+
         console.log(xmlDoc);
-        
+
         // 解析静态刚体
         this.parseStatics(xmlDoc);
-        
+
         // 解析形状
         this.parseShapes(xmlDoc);
-        
+
         // 解析三角形网格
         this.parseTriangles(xmlDoc);
-        
+
         // 解析凸包网格
         this.parseConvexes(xmlDoc);
     }
@@ -59,10 +59,10 @@ export class PhysxXmlData {
         for (let i = 0; i < statics.length; i++) {
             const item = statics.item(i);
             if (!item) continue;
-            
+
             const ids = item.getElementsByTagName("Id");
             if (ids.length <= 0) continue;
-            
+
             const id = Number(ids.item(0)?.textContent);
             if (!isNaN(id)) {
                 this.statics.set(id, { id, element: item });
@@ -71,6 +71,22 @@ export class PhysxXmlData {
                 this.firstId = id;
             }
         }
+        const dynamics = xmlDoc.getElementsByTagName("PxRigidDynamic");
+        for (let i = 0; i < dynamics.length; i++) {
+            const item = dynamics.item(i);
+            if (!item) continue;
+
+            const ids = item.getElementsByTagName("Id");
+            if (ids.length <= 0) continue;
+
+            const id = Number(ids.item(0)?.textContent);
+            if (!isNaN(id)) {
+                if (this.firstId == 0) {
+                    this.firstId = id;
+                }
+            }
+        }
+
         console.log("Parsed statics:", this.statics);
     }
 
@@ -83,10 +99,10 @@ export class PhysxXmlData {
         for (let i = 0; i < shapes.length; i++) {
             const item = shapes.item(i);
             if (!item) continue;
-            
+
             const ids = item.getElementsByTagName("Id");
             if (ids.length <= 0) continue;
-            
+
             const id = Number(ids.item(0)?.textContent);
             if (!isNaN(id)) {
                 this.shapes.set(id, { id, element: item });
@@ -104,10 +120,10 @@ export class PhysxXmlData {
         for (let i = 0; i < triangles.length; i++) {
             const item = triangles.item(i);
             if (!item) continue;
-            
+
             const ids = item.getElementsByTagName("Id");
             if (ids.length <= 0) continue;
-            
+
             const id = Number(ids.item(0)?.textContent);
             if (!isNaN(id)) {
                 this.triangles.set(id, { id, element: item });
@@ -125,10 +141,10 @@ export class PhysxXmlData {
         for (let i = 0; i < convexes.length; i++) {
             const item = convexes.item(i);
             if (!item) continue;
-            
+
             const ids = item.getElementsByTagName("Id");
             if (ids.length <= 0) continue;
-            
+
             const id = Number(ids.item(0)?.textContent);
             if (!isNaN(id)) {
                 this.convexes.set(id, { id, element: item });
@@ -159,7 +175,7 @@ export class PhysxXmlData {
 
         const group = new THREE.Group();
         const shapeIds = shapeRef.getElementsByTagName("PxShapeRef");
-        
+
         for (let i = 0; i < shapeIds.length; i++) {
             const shapeId = Number(shapeIds.item(i)?.textContent?.trim());
             if (shapeId <= 0) {
@@ -194,7 +210,7 @@ export class PhysxXmlData {
         let mesh: THREE.Mesh | null = null;
         const [pos, rot] = this.getLocalPose(shape.element);
         const child = geo.children.item(0);
-        
+
         if (!child) return null;
 
         switch (child.localName) {
@@ -256,7 +272,7 @@ export class PhysxXmlData {
     private getLocalPose(shape: Element): [THREE.Vector3, THREE.Quaternion] {
         const rot = new THREE.Quaternion();
         const pos = new THREE.Vector3();
-        
+
         const poses = shape.getElementsByTagName("LocalPose");
         if (poses.length <= 0) {
             return [pos, rot];
@@ -346,25 +362,25 @@ export class PhysxXmlData {
         const triMeshId = Number(triMeshElement.textContent?.trim());
         const [scale, rotate] = this.getPxScale(geo);
         const [points, triangles, cookedData] = this.getPxTriangleData(triMeshId);
-        
+
         if (!points) {
             return null;
         }
 
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-        
+
         if (triangles) {
             geometry.setIndex(triangles);
         }
 
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x60BF81, 
-            emissive: 0x072534, 
-            side: THREE.DoubleSide, 
-            flatShading: true 
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x60BF81,
+            emissive: 0x072534,
+            side: THREE.DoubleSide,
+            flatShading: true
         });
-        
+
         const mesh = new THREE.Mesh(geometry, material);
         mesh.scale.copy(scale);
         mesh.quaternion.multiply(rotate);
@@ -382,13 +398,13 @@ export class PhysxXmlData {
         const half = this.getTextContent(halfElement).split(' ').map(Number);
 
         const geometry = new THREE.BoxGeometry(2 * half[0], 2 * half[1], 2 * half[2]);
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x347355, 
-            emissive: 0x072534, 
-            side: THREE.DoubleSide, 
-            flatShading: true 
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x347355,
+            emissive: 0x072534,
+            side: THREE.DoubleSide,
+            flatShading: true
         });
-        
+
         return new THREE.Mesh(geometry, material);
     }
 
@@ -422,7 +438,7 @@ export class PhysxXmlData {
         const convMeshId = Number(convMeshElement.textContent?.trim());
         const [scale, rotate] = this.getPxScale(geo);
         const points = this.getPxConvexData(convMeshId);
-        
+
         if (!points) {
             return null;
         }
@@ -433,13 +449,13 @@ export class PhysxXmlData {
         }
 
         const geometry = new ConvexGeometry(pointList);
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x3B8C66, 
-            emissive: 0x072534, 
-            side: THREE.DoubleSide, 
-            flatShading: true 
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x3B8C66,
+            emissive: 0x072534,
+            side: THREE.DoubleSide,
+            flatShading: true
         });
-        
+
         const mesh = new THREE.Mesh(geometry, material);
         mesh.scale.copy(scale);
         mesh.quaternion.multiply(rotate);
@@ -455,15 +471,15 @@ export class PhysxXmlData {
     private buildSphere(geo: Element): THREE.Mesh {
         const radiusElement = geo.getElementsByTagName("Radius").item(0);
         const radius = Number(this.getTextContent(radiusElement));
-        
+
         const geometry = new THREE.SphereGeometry(radius, 16, 16);
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x223240, 
-            emissive: 0x072534, 
-            side: THREE.DoubleSide, 
-            flatShading: true 
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x223240,
+            emissive: 0x072534,
+            side: THREE.DoubleSide,
+            flatShading: true
         });
-        
+
         return new THREE.Mesh(geometry, material);
     }
 
@@ -475,18 +491,18 @@ export class PhysxXmlData {
     private buildCapsule(geo: Element): THREE.Mesh {
         const radiusElement = geo.getElementsByTagName("Radius").item(0);
         const halfHeightElement = geo.getElementsByTagName("HalfHeight").item(0);
-        
+
         const radius = Number(this.getTextContent(radiusElement));
         const halfHeight = Number(this.getTextContent(halfHeightElement));
 
         const geometry = new THREE.CapsuleGeometry(radius, halfHeight, 4, 8);
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x93D94E, 
-            emissive: 0x072534, 
-            side: THREE.DoubleSide, 
-            flatShading: true 
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x93D94E,
+            emissive: 0x072534,
+            side: THREE.DoubleSide,
+            flatShading: true
         });
-        
+
         return new THREE.Mesh(geometry, material);
     }
 

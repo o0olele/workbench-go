@@ -14,6 +14,10 @@ export function ClearAgent(arg1) {
   return window['go']['main']['App']['ClearAgent'](arg1);
 }
 
+export function CreateRigidKinematic(arg1, arg2) {
+  return window['go']['main']['App']['CreateRigidKinematic'](arg1, arg2);
+}
+
 export function ExistOctree(arg1) {
   return window['go']['main']['App']['ExistOctree'](arg1);
 }
@@ -30,6 +34,14 @@ export function GetOctreeData(arg1) {
   return window['go']['main']['App']['GetOctreeData'](arg1);
 }
 
+export function InitPhysx(arg1, arg2) {
+  return window['go']['main']['App']['InitPhysx'](arg1, arg2);
+}
+
+export function LoadAndCreateRigidKinematic(arg1, arg2) {
+  return window['go']['main']['App']['LoadAndCreateRigidKinematic'](arg1, arg2);
+}
+
 export function LoadNavMesh(arg1, arg2, arg3, arg4) {
   return window['go']['main']['App']['LoadNavMesh'](arg1, arg2, arg3, arg4);
 }
@@ -38,12 +50,28 @@ export function LoadNavMeshLocal(arg1, arg2, arg3, arg4) {
   return window['go']['main']['App']['LoadNavMeshLocal'](arg1, arg2, arg3, arg4);
 }
 
+export function LoadPhysxXml(arg1) {
+  return window['go']['main']['App']['LoadPhysxXml'](arg1);
+}
+
+export function LoadPhysxXmlString(arg1) {
+  return window['go']['main']['App']['LoadPhysxXmlString'](arg1);
+}
+
 export function OpenFileDialog(arg1, arg2) {
   return window['go']['main']['App']['OpenFileDialog'](arg1, arg2);
 }
 
+export function PhysxStep() {
+  return window['go']['main']['App']['PhysxStep']();
+}
+
 export function ProcessSelectedFiles(arg1) {
   return window['go']['main']['App']['ProcessSelectedFiles'](arg1);
+}
+
+export function ReleasePhysx() {
+  return window['go']['main']['App']['ReleasePhysx']();
 }
 
 export function RemoveNavMesh(arg1) {
@@ -56,6 +84,10 @@ export function ResetOctree(arg1) {
 
 export function SetAgentTarget(arg1, arg2, arg3, arg4) {
   return window['go']['main']['App']['SetAgentTarget'](arg1, arg2, arg3, arg4);
+}
+
+export function SetRigidKinematicPosition(arg1, arg2) {
+  return window['go']['main']['App']['SetRigidKinematicPosition'](arg1, arg2);
 }
 
 export function TeleportAgent(arg1, arg2, arg3, arg4) {
