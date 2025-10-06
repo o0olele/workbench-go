@@ -9,6 +9,7 @@ type App struct {
 	ctx       context.Context
 	meshMgr   *NavMgr
 	octreeMgr *OctreeMgr
+	physxMgr  *PhysxMgr
 }
 
 // NewApp creates a new App application struct
