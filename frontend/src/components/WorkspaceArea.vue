@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Plus, X, Joystick } from 'lucide-vue-next'
+import { Plus, X, Joystick, GitBranch } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import FileImportArea from './FileImportArea.vue'
@@ -9,10 +9,11 @@ import ThreeJSScene from './ThreeJSScene.vue'
 import NavMeshScene from './NavMeshScene.vue'
 import OctreeScene from './OctreeScene.vue'
 import PhysxDebugScene from './PhysxDebugScene.vue'
+import StateTreeScene from './StateTreeScene.vue'
 
 const { t } = useI18n()
 
-type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree' | 'physx'
+type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree' | 'physx' | 'statetree'
 
 interface TabItem {
   id: string
@@ -124,6 +125,17 @@ const handlePhysxDebugScene = () => {
   currentTab.title = 'workspace.physx_debug'
 }
 
+const handleStateTreeScene = () => {
+  // 找到当前激活的tab
+  const currentTabIndex = tabs.value.findIndex(tab => tab.id === activeTab.value)
+  if (currentTabIndex === -1) return
+
+  // 将当前tab转换为StateTree场景类型
+  const currentTab = tabs.value[currentTabIndex]
+  currentTab.type = 'statetree'
+  currentTab.title = 'workspace.statetree_debug'
+}
+
 const navMeshFilters = [
   { pattern: '*.bin', displayName: 'Binary NavMesh (*.bin)' },
   { pattern: '*.navmesh', displayName: 'NavMesh Files (*.navmesh)' }
@@ -231,6 +243,28 @@ const navMeshFilters = [
                   </div>
                 </div>
 
+                <!-- StateTree场景 -->
+                <div
+                  class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-accent/50 border-border"
+                  @click="handleStateTreeScene">
+                  <div class="flex flex-col items-center space-y-4">
+                    <div class="p-4 rounded-full bg-accent">
+                      <GitBranch class="w-8 h-8 text-muted-foreground" />
+                    </div>
+
+                    <div>
+                      <h3 class="text-lg font-semibold mb-2">{{ t('workspace.statetree_debug') }}</h3>
+                      <p class="text-sm text-muted-foreground mb-2">
+                        {{ t('workspace.click_to_enter_statetree') }}
+                      </p>
+                      <p class="text-xs text-muted-foreground">
+                        {{ t('workspace.state_management') }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                
               </div>
             </div>
           </div>
@@ -250,15 +284,20 @@ const navMeshFilters = [
             <OctreeScene :id="tab.id" />
           </div>
 
-          <!-- PhysX调试场景类型 -->
-          <div v-else-if="tab.type === 'physx'" class="h-full">
-            <PhysxDebugScene :id="tab.id" />
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  </div>
-</template>
+           <!-- PhysX调试场景类型 -->
+           <div v-else-if="tab.type === 'physx'" class="h-full">
+             <PhysxDebugScene :id="tab.id" />
+           </div>
+
+           <!-- StateTree场景类型 -->
+           <div v-else-if="tab.type === 'statetree'" class="h-full">
+             <StateTreeScene :id="tab.id" />
+           </div>
+         </TabsContent>
+       </Tabs>
+     </div>
+   </div>
+ </template>
 
 <style scoped>
 /* 固定标签页宽度 */
@@ -271,3 +310,9 @@ const navMeshFilters = [
   flex-basis: 200px !important;
 }
 </style>
+
+
+
+
+
+

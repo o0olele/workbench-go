@@ -39,7 +39,12 @@ const messages = {
             "octree_tab_title": "八叉树可视化",
             "physx_debug": "PhysX调试",
             "click_to_enter_physx": "点击进入PhysX调试场景",
-            "welcome_content": "欢迎使用Workbench！"
+            "welcome_content": "欢迎使用Workbench！",
+            "statetree_debug": 'StateTree调试',
+            "click_to_enter_statetree": '点击进入StateTree调试场景',
+            "state_management": '状态管理可视化',
+            "statetree_content": 'StateTree内容将在这里显示',
+            "statetree_placeholder": 'StateTree功能开发中...'
         },
         "app": {
             "name": "Workbench",
@@ -84,7 +89,11 @@ const messages = {
             "drop_files": "Drop files to import",
             "physx_debug": "PhysX Debug",
             "click_to_enter_physx": "Click to enter PhysX debug scene",
-            "welcome_content": "Welcome to Workbench!"
+            "welcome_content": "Welcome to Workbench!",
+            "statetree_debug": "StateTree Debug",
+            "click_to_enter_statetree": "Click to enter StateTree debug scene",
+            "state_management": "State management visualization",
+            "statetree_content_placeholder": "StateTree content will be displayed here"
         },
         "app": {
             "name": "Workbench",
