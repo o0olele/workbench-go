@@ -117,12 +117,12 @@ type Condition interface {
 
 // Logger defines the logging interface.
 type Logger interface {
-	Printf(format string, v ...interface{})
+	Printf(format string, v ...any)
 }
 
 type DefaultLogger struct{}
 
-func (l *DefaultLogger) Printf(format string, v ...interface{}) {
+func (l *DefaultLogger) Printf(format string, v ...any) {
 	fmt.Printf(format+"\n", v...)
 }
 
