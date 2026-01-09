@@ -191,7 +191,7 @@ export class DebugCrowd {
         })
     }
 
-    createPathFolder(pane: Pane) {
+    createPathFolder(pane: Pane, onFocusStart?: () => void) {
         const folder = pane.addFolder({ title: "Test Path" })
         folder.addBinding(this, 'start', { label: 'Start' }).on('change', () => {
             this.teleportAgent(this.tabId, this.start)
@@ -199,6 +199,9 @@ export class DebugCrowd {
         folder.addBinding(this, 'end', { label: 'End' }).on('change', () => {
             this.moveAgent(this.tabId, this.end)
         })
+        if (onFocusStart) {
+            folder.addButton({ title: 'Focus Start' }).on('click', onFocusStart)
+        }
     }
 
     createDebugFolder(pane: Pane) {

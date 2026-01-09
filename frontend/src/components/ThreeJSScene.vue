@@ -85,7 +85,7 @@ const initScene = () => {
   updateSceneBackground() // 使用主题相关的背景色
 
   // 创建相机
-  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
+  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 10000)
   camera.position.set(5, 5, 5)
   camera.lookAt(0, 0, 0)
 
@@ -130,7 +130,7 @@ const initScene = () => {
   controls.dampingFactor = 0.05
   controls.screenSpacePanning = false
   controls.minDistance = 1
-  controls.maxDistance = 100
+  controls.maxDistance = 10000
 
   // 创建相机控制器
   cameraControls = new CameraControls(camera, controls, canvasRef.value)

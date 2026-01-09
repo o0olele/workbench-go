@@ -7,6 +7,7 @@ import { LogDebug } from '../../wailsjs/runtime/runtime'
 import { DebugDrawer } from '@/lib/debug-drawer'
 import { FolderApi, Pane } from 'tweakpane'
 import { CrowdHelper, DebugCrowd } from '@/lib/crowd'
+import { CameraControls } from '@/lib/camera-controls'
 
 interface Props {
     files?: string[],
@@ -32,15 +33,16 @@ let raycaster: THREE.Raycaster
 let crowd: DebugCrowd
 let crowdHelper: CrowdHelper
 let themeObserver: MutationObserver | null = null
+let cameraControls: CameraControls
 
 // 主题相关
 const updateSceneBackground = () => {
     if (!scene) return
-    
+
     // 获取当前主题的背景色
     const htmlElement = document.documentElement
     const isDark = htmlElement.classList.contains('dark')
-    
+
     if (isDark) {
         // 深色主题：使用深灰色
         scene.background = new THREE.Color(0x1a1a1a)
@@ -79,7 +81,7 @@ const initScene = () => {
     updateSceneBackground() // 使用主题相关的背景色
 
     // 创建相机
-    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
+    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 10000)
     camera.position.set(5, 5, 5)
     camera.lookAt(0, 0, 0)
 
@@ -127,8 +129,10 @@ const initScene = () => {
     controls.dampingFactor = 0.05
     controls.screenSpacePanning = false
     controls.minDistance = 1
-    controls.maxDistance = 100
-    controls.maxPolarAngle = Math.PI / 2 // 限制垂直旋转角度
+    controls.maxDistance = 10000
+
+    // 创建相机控制器
+    cameraControls = new CameraControls(camera, controls, canvasRef.value)
 
     // 设置尺寸监听
     setupResizeObserver()
@@ -152,7 +156,12 @@ const initScene = () => {
             crowdHelper.update()
             scene.add(crowdHelper)
         })
-        crowd.createPathFolder(pane)
+        crowd.createPathFolder(pane, () => {
+            const start = crowd.start
+            controls.target.set(start.x, start.y, start.z)
+            camera.position.set(start.x + 5, start.y + 10, start.z + 5)
+            controls.update()
+        })
         crowd.createDebugFolder(pane)
     }
 
@@ -241,6 +250,11 @@ const resizeRenderer = (width: number, height: number) => {
 const animate = () => {
     animationId = requestAnimationFrame(animate)
 
+    // 更新相机控制
+    if (cameraControls) {
+        cameraControls.update()
+    }
+
     // 更新轨道控制器
     if (controls) {
         controls.update()
@@ -249,7 +263,7 @@ const animate = () => {
     if (props.navMeshId && crowd) {
         // 获取移动状态信息
         const status = crowd.getMovementStatus()
-        
+
         // 始终更新调试状态显示
         crowd.debugStatus.isMoving = status.isMoving
         crowd.debugStatus.stillFrames = status.stillFrameCount
@@ -356,7 +370,7 @@ onMounted(() => {
                 }
             })
         })
-        
+
         // 开始观察 html 元素的 class 属性变化
         themeObserver.observe(document.documentElement, {
             attributes: true,
@@ -381,6 +395,10 @@ onUnmounted(() => {
     }
     if (renderer) {
         renderer.dispose()
+    }
+    // 清理相机控制器
+    if (cameraControls) {
+        cameraControls.dispose()
     }
     if (resizeObserver) {
         resizeObserver.disconnect()
