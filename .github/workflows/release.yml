@@ -42,6 +42,22 @@ jobs:
     #     # Example: Download DLLs to build/bin or project root
     #     # Invoke-WebRequest ...
 
+    - name: Prepare DLLs
+      shell: pwsh
+      run: |
+        $binDir = "build/bin"
+        if (Test-Path $binDir) {
+            $dlls = Get-ChildItem -Path $binDir -Filter "*.dll"
+            if ($dlls) {
+                $dlls | Copy-Item -Destination .
+                Write-Host "Copied DLLs to root: $($dlls.Name -join ', ')"
+            } else {
+                Write-Warning "No DLLs found in $binDir."
+            }
+        } else {
+             Write-Warning "Directory $binDir does not exist."
+        }
+
     - name: Build
       run: |
         wails build -platform windows/amd64
