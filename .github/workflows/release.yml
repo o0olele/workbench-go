@@ -11,6 +11,9 @@ env:
   BIN_NAME: workbench-go
   PACKAGE_NAME: workbench-go-win-amd64-portable
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build and Release
