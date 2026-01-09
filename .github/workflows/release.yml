@@ -1,0 +1,97 @@
+name: Release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BIN_NAME: workbench-go
+  PACKAGE_NAME: workbench-go-win-amd64-portable
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23.1'
+        check-latest: true
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Wails
+      run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.10.1
+
+    # NOTE: If your project relies on external DLLs (e.g. for PhysX), 
+    # you must ensure they are available in the build environment.
+    # Since they are likely ignored in .gitignore, you might need to download them here.
+    # - name: Download Dependencies
+    #   run: |
+    #     # Example: Download DLLs to build/bin or project root
+    #     # Invoke-WebRequest ...
+
+    - name: Build
+      run: |
+        wails build -platform windows/amd64
+
+    - name: Package
+      shell: pwsh
+      run: |
+        $packageName = "${{ env.PACKAGE_NAME }}"
+        New-Item -ItemType Directory -Force -Path $packageName
+        
+        # Define source paths
+        $binDir = "build/bin"
+        $exePath = "$binDir/${{ env.BIN_NAME }}.exe"
+        
+        # Check if exe exists
+        if (-not (Test-Path $exePath)) {
+            Write-Error "Executable not found at $exePath"
+            exit 1
+        }
+        
+        # Copy Executable
+        Copy-Item $exePath -Destination $packageName
+        
+        # Copy DLLs from build/bin
+        # The user requested to bundle DLLs from build/bin.
+        if (Test-Path $binDir) {
+            $dlls = Get-ChildItem -Path $binDir -Filter "*.dll"
+            if ($dlls) {
+                $dlls | Copy-Item -Destination $packageName
+                Write-Host "Included DLLs: $($dlls.Name -join ', ')"
+            } else {
+                Write-Warning "No DLLs found in $binDir. The application might fail to run if it depends on them."
+            }
+        } else {
+             Write-Warning "Directory $binDir does not exist."
+        }
+        
+        # Compress
+        Compress-Archive -Path "$packageName\*" -DestinationPath "$packageName.zip"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PACKAGE_NAME }}
+        path: ${{ env.PACKAGE_NAME }}.zip
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ env.PACKAGE_NAME }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
