@@ -31,7 +31,6 @@
           <span class="font-bold text-xs text-gray-300">Asset Details</span>
           <div class="flex gap-1">
              <SettingsIcon class="w-3 h-3 text-gray-500 hover:text-white cursor-pointer" />
-             <XIcon class="w-3 h-3 text-gray-500 hover:text-white cursor-pointer" />
           </div>
         </div>
         
@@ -40,90 +39,12 @@
            <div class="relative">
              <SearchIcon class="absolute left-2 top-1.5 w-3.5 h-3.5 text-gray-500" />
              <input type="text" placeholder="Search Details" class="w-full bg-[#111] border border-[#333] rounded-sm px-2 py-1 pl-8 text-xs focus:border-[#007fd4] outline-none transition-colors placeholder-gray-600 text-gray-300" />
-             <div class="absolute right-2 top-1.5 flex gap-1">
-                 <FilterIcon class="w-3.5 h-3.5 text-gray-500 cursor-pointer hover:text-white" />
-                 <Settings2Icon class="w-3.5 h-3.5 text-gray-500 cursor-pointer hover:text-white" />
-             </div>
+             
            </div>
         </div>
 
         <!-- Properties List (Mock) -->
         <div class="flex-1 overflow-y-auto p-0 custom-scrollbar">
-           <!-- Section: General -->
-           <div class="border-b border-[#111]">
-              <div class="flex items-center gap-1 px-2 py-1 bg-[#2a2a2a] hover:bg-[#333] cursor-pointer select-none" @click="toggleSection('general')">
-                 <ChevronDownIcon class="w-3 h-3 text-gray-400" v-if="sections.general" />
-                 <ChevronRightIcon class="w-3 h-3 text-gray-400" v-else />
-                 <span class="font-bold text-xs text-gray-300">General</span>
-              </div>
-              <div class="p-2 space-y-2 bg-[#1e1e1e]" v-if="sections.general">
-                 <div class="grid grid-cols-[110px_1fr] items-center gap-2">
-                    <span class="text-xs text-gray-400 truncate cursor-help" title="Schema">Schema</span>
-                    <div class="bg-[#111] border border-[#333] rounded-sm px-2 py-1 text-xs flex items-center justify-between cursor-pointer hover:border-gray-500 group">
-                       <span class="flex items-center gap-1"><BoxIcon class="w-3 h-3 text-purple-400"/> StateTreeComponent</span>
-                       <ChevronRightIcon class="w-3 h-3 text-gray-600 group-hover:text-gray-400" />
-                    </div>
-                 </div>
-                 <div class="grid grid-cols-[110px_1fr] items-center gap-2">
-                    <span class="text-xs text-gray-400 truncate cursor-help" title="Context Actor Class">Context Actor Class</span>
-                    <div class="bg-[#111] border border-[#333] rounded-sm px-2 py-1 text-xs flex items-center justify-between cursor-pointer hover:border-gray-500 group">
-                       <span class="text-blue-400 group-hover:text-blue-300">Actor</span>
-                       <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <CornerUpLeftIcon class="w-3 h-3 text-gray-500 hover:text-white" />
-                         <SearchIcon class="w-3 h-3 text-gray-500 hover:text-white" />
-                       </div>
-                    </div>
-                 </div>
-                 <div class="grid grid-cols-[110px_1fr] items-center gap-2">
-                    <span class="text-xs text-gray-400 truncate cursor-help" title="Tick Strategy">Tick Strategy</span>
-                    <div class="bg-[#111] border border-[#333] rounded-sm px-2 py-1 text-xs flex items-center justify-between cursor-pointer hover:border-gray-500">
-                       <span>Default</span>
-                       <ChevronDownIcon class="w-3 h-3 text-gray-500" />
-                    </div>
-                 </div>
-              </div>
-           </div>
-
-           <!-- Section: Context -->
-           <div class="border-b border-[#111]">
-              <div class="flex items-center gap-1 px-2 py-1 bg-[#2a2a2a] hover:bg-[#333] cursor-pointer select-none group" @click="toggleSection('context')">
-                 <ChevronDownIcon class="w-3 h-3 text-gray-400" v-if="sections.context" />
-                 <ChevronRightIcon class="w-3 h-3 text-gray-400" v-else />
-                 <span class="font-bold text-xs text-gray-300">Context</span>
-                 <div class="flex-1"></div>
-                 <PlusCircleIcon class="w-3 h-3 text-gray-500 hover:text-green-400 opacity-0 group-hover:opacity-100" />
-              </div>
-              <div class="bg-[#1e1e1e] py-1" v-if="sections.context">
-                   <!-- Header for table -->
-                   <div class="flex px-2 py-1 text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-                       <div class="w-1/2">Name</div>
-                       <div class="w-1/2">Type</div>
-                   </div>
-                   <!-- Row -->
-                   <div class="flex items-center px-2 py-1 hover:bg-[#2a2a2a] cursor-pointer group">
-                       <div class="w-1/2 flex items-center gap-2">
-                           <UserIcon class="w-3 h-3 text-blue-400" />
-                           <span class="text-xs text-gray-300">Actor</span>
-                       </div>
-                        <div class="w-1/2 flex items-center justify-between">
-                           <span class="text-[10px] text-blue-400 bg-[#111] border border-[#333] px-1 rounded">Actor</span>
-                            <Trash2Icon class="w-3 h-3 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100" />
-                       </div>
-                   </div>
-              </div>
-           </div>
-           
-           <!-- Section: Parameters -->
-           <div class="border-b border-[#111]">
-              <div class="flex items-center justify-between px-2 py-1 bg-[#2a2a2a] hover:bg-[#333] cursor-pointer select-none group" @click="toggleSection('parameters')">
-                 <div class="flex items-center gap-1">
-                    <ChevronRightIcon class="w-3 h-3 text-gray-400" v-if="!sections.parameters" />
-                    <ChevronDownIcon class="w-3 h-3 text-gray-400" v-else />
-                    <span class="font-bold text-xs text-gray-300">Parameters</span>
-                 </div>
-                 <PlusCircleIcon class="w-3 h-3 text-gray-500 hover:text-green-400 opacity-0 group-hover:opacity-100" />
-              </div>
-           </div>
 
             <!-- Section: Evaluators -->
            <div class="border-b border-[#111]">

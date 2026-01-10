@@ -12,7 +12,10 @@ const messages = {
             "restore": "还原",
             "language": "语言",
             "chinese": "中文",
-            "english": "English"
+            "english": "English",
+            "copy": "复制",
+            "copied": "已复制",
+            "refresh": "刷新"
         },
         "theme": {
             "light": "浅色主题",
@@ -44,7 +47,24 @@ const messages = {
             "click_to_enter_statetree": '点击进入StateTree调试场景',
             "state_management": '状态管理可视化',
             "statetree_content": 'StateTree内容将在这里显示',
-            "statetree_placeholder": 'StateTree功能开发中...'
+            "statetree_placeholder": 'StateTree功能开发中...',
+            "tool_utils": "工具箱",
+            "click_to_enter_tools": "点击进入实用工具页面",
+            "tools_desc": "包含时间戳转换、随机密码生成等工具"
+        },
+        "tool_utils": {
+            "timestamp_converter": "时间戳转换",
+            "current_time": "当前时间",
+            "timestamp_desc": "在Unix时间戳（秒）和日期时间格式之间转换",
+            "timestamp": "时间戳",
+            "seconds": "秒",
+            "datetime": "日期时间",
+            "password_generator": "随机密码生成器",
+            "password_desc": "生成包含字母、数字和符号的安全密码",
+            "password_length": "密码长度",
+            "custom_symbols": "自定义特殊字符",
+            "custom_symbols_placeholder": "输入允许的特殊字符",
+            "copied_desc": "已复制到剪贴板"
         },
         "app": {
             "name": "Workbench",
@@ -62,7 +82,10 @@ const messages = {
             "restore": "Restore",
             "language": "Language",
             "chinese": "中文",
-            "english": "English"
+            "english": "English",
+            "copy": "Copy",
+            "copied": "Copied",
+            "refresh": "Refresh"
         },
         "theme": {
             "light": "Light Theme",
@@ -93,7 +116,24 @@ const messages = {
             "statetree_debug": "StateTree Debug",
             "click_to_enter_statetree": "Click to enter StateTree debug scene",
             "state_management": "State management visualization",
-            "statetree_content_placeholder": "StateTree content will be displayed here"
+            "statetree_content_placeholder": "StateTree content will be displayed here",
+            "tool_utils": "Tool Utils",
+            "click_to_enter_tools": "Click to enter utility tools page",
+            "tools_desc": "Includes timestamp converter, random password generator, etc."
+        },
+        "tool_utils": {
+            "timestamp_converter": "Timestamp Converter",
+            "current_time": "Current Time",
+            "timestamp_desc": "Convert between Unix timestamp (seconds) and Date Time",
+            "timestamp": "Timestamp",
+            "seconds": "Seconds",
+            "datetime": "Date Time",
+            "password_generator": "Password Generator",
+            "password_desc": "Generate secure passwords with letters, numbers, and symbols",
+            "password_length": "Password Length",
+            "custom_symbols": "Custom Special Characters",
+            "custom_symbols_placeholder": "Enter allowed special characters",
+            "copied_desc": "Copied to clipboard"
         },
         "app": {
             "name": "Workbench",

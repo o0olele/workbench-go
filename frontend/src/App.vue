@@ -1,8 +1,10 @@
 <script lang="ts" setup>
+import 'vue-sonner/style.css'
 import { onMounted } from 'vue'
 import TitleBar from './components/TitleBar.vue'
 import WorkspaceArea from './components/WorkspaceArea.vue'
 import StatusBar from './components/StatusBar.vue'
+import { Toaster } from '@/components/ui/sonner'
 import { setLocale, getCurrentLocale } from './i18n'
 
 // 在应用启动时初始化语言设置
@@ -26,6 +28,7 @@ onMounted(() => {
       <WorkspaceArea />
     </div>
     <StatusBar />
+    <Toaster />
   </div>
 </template>
 
@@ -39,10 +42,13 @@ onMounted(() => {
 
 .app-content {
   flex: 1;
-  padding-top: 32px; /* 为固定定位的标题栏留出空间（30px + 2px边框）*/
-  padding-bottom: 0; /* 为状态栏留出空间 */
+  padding-top: 32px;
+  /* 为固定定位的标题栏留出空间（30px + 2px边框）*/
+  padding-bottom: 0;
+  /* 为状态栏留出空间 */
   box-sizing: border-box;
   overflow: hidden;
-  min-height: 0; /* 确保 flexbox 子项可以收缩 */
+  min-height: 0;
+  /* 确保 flexbox 子项可以收缩 */
 }
 </style>

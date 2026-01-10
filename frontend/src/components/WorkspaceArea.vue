@@ -10,10 +10,11 @@ import NavMeshScene from './NavMeshScene.vue'
 import OctreeScene from './OctreeScene.vue'
 import PhysxDebugScene from './PhysxDebugScene.vue'
 import StateTreeScene from './StateTreeScene.vue'
+import ToolUtils from './ToolUtils.vue'
 
 const { t } = useI18n()
 
-type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree' | 'physx' | 'statetree'
+type TabType = 'welcome' | 'threejs' | 'navmesh' | 'octree' | 'physx' | 'statetree' | 'tools'
 
 interface TabItem {
   id: string
@@ -134,6 +135,17 @@ const handleStateTreeScene = () => {
   const currentTab = tabs.value[currentTabIndex]
   currentTab.type = 'statetree'
   currentTab.title = 'workspace.statetree_debug'
+}
+
+const handleToolUtils = () => {
+  // 找到当前激活的tab
+  const currentTabIndex = tabs.value.findIndex(tab => tab.id === activeTab.value)
+  if (currentTabIndex === -1) return
+
+  // 将当前tab转换为工具类型
+  const currentTab = tabs.value[currentTabIndex]
+  currentTab.type = 'tools'
+  currentTab.title = 'workspace.tool_utils'
 }
 
 const navMeshFilters = [
@@ -264,6 +276,35 @@ const navMeshFilters = [
                   </div>
                 </div>
 
+                <!-- 工具箱 -->
+                <div
+                  class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-accent/50 border-border"
+                  @click="handleToolUtils">
+                  <div class="flex flex-col items-center space-y-4">
+                    <div class="p-4 rounded-full bg-accent">
+                      <svg class="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                        </path>
+                      </svg>
+                    </div>
+
+                    <div>
+                      <h3 class="text-lg font-semibold mb-2">{{ t('workspace.tool_utils') }}</h3>
+                      <p class="text-sm text-muted-foreground mb-2">
+                        {{ t('workspace.click_to_enter_tools') }}
+                      </p>
+                      <p class="text-xs text-muted-foreground">
+                        {{ t('workspace.tools_desc') }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 
               </div>
             </div>
@@ -292,6 +333,11 @@ const navMeshFilters = [
            <!-- StateTree场景类型 -->
            <div v-else-if="tab.type === 'statetree'" class="h-full">
              <StateTreeScene :id="tab.id" />
+           </div>
+
+           <!-- 工具箱类型 -->
+           <div v-else-if="tab.type === 'tools'" class="h-full">
+             <ToolUtils />
            </div>
          </TabsContent>
        </Tabs>
