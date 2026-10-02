@@ -12,11 +12,19 @@ import (
 var assets embed.FS
 
 func main() {
+	// Initialize logger
+	logFile, err := InitLogger()
+	if err != nil {
+		println("Failed to initialize logger:", err.Error())
+	} else {
+		defer logFile.Close()
+	}
+
 	// Create an instance of the app structure
 	app := NewApp()
 
 	// Create application with options
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:  "workbench-go",
 		Width:  1024,
 		Height: 768,
